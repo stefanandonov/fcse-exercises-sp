@@ -38,7 +38,7 @@ jobs:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         run: |
-          if [[ -n $(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep "Dockerfile") ]]; then
+          if [[ -n $(git diff --name-only HEAD^ HEAD | grep Dockerfile) ]]; then echo 
             echo "Building and pushing Docker image..."
             echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
             docker buildx build -t $DOCKER_USERNAME/pandoc-fcse:latest --push .
