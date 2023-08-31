@@ -4,7 +4,7 @@ name: Build and deploy static html pages for the SP exercises
 on:
   # Runs on pushes targeting the default branch
   push:
-    branches: ["master"]
+    branches: [ "master" ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -23,41 +23,63 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # Single deploy job since we're just deploying
-  build:
+  build-and-push:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v2
+      - name: Checkout Repository
+        uses: actions/checkout@v2
 
-    - name: Install pandoc
-      run: sudo apt-get install -y pandoc
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
 
-    - name: Install Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.11  # Adjust the Python version as needed
+      - name: Build and Push Docker Image
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: |
+          if [[ -n $(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep "Dockerfile") ]]; then
+            echo "Building and pushing Docker image..."
+            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+            docker buildx build -t $DOCKER_USERNAME/pandoc-fcse:latest --push .
+          else
+            echo "No changes in Dockerfile. Skipping image build and push."
+          fi
 
-    - name: Install pypandoc
-      run: |
-        python -m pip install --upgrade pip
-        pip install pypandoc
+  build-htmls:
+    runs-on: ubuntu-latest
 
-    - name: Install xelatex
-      run: sudo apt-get install -y texlive-xetex  # Install xelatex
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
 
-    - name: Run create_files.py
-      run: python create_files.py  # Convert MD to HTML and PDFs using pypandoc
+      - name: Install pandoc
+        run: sudo apt-get install -y pandoc
 
-    - name: Create index files
-      run: python create_index_pages.py # Create a content HTML named index.html in mk and en subfolders
+      - name: Install Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.11  # Adjust the Python version as needed
 
-    - name: Archive Output Directory
-      uses: actions/upload-artifact@v2
-      with:
-        name: output-html
-        path: output/output_html  # Adjust the path to your output directory
+      - name: Install pypandoc
+        run: |
+          python -m pip install --upgrade pip
+          pip install pypandoc
+
+      - name: Install xelatex
+        run: sudo apt-get install -y texlive-xetex  # Install xelatex
+
+      - name: Run create_files.py
+        run: python create_files.py  # Convert MD to HTML and PDFs using pypandoc
+
+      - name: Create index files
+        run: python create_index_pages.py # Create a content HTML named index.html in mk and en subfolders
+
+      - name: Archive Output Directory
+        uses: actions/upload-artifact@v2
+        with:
+          name: output-html
+          path: output/output_html  # Adjust the path to your output directory
   deploy:
     environment:
       name: github-pages
