@@ -9,5 +9,6 @@ RUN apt-get update && \
     texlive-xetex
 
 # Install pypandoc
+# command
 RUN python3.11 -m pip install --upgrade pip && \
-    pip install pypandoc
+    pip install pypandoc \
