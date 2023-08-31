@@ -1,0 +1,36 @@
+name: Convert MDs to HTMLs and pdfs
+
+on:
+  push:
+    branches:
+      - master  # Adjust this to the branch you want to trigger the workflow on
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Install pandoc
+      run: sudo apt-get install -y pandoc
+
+    - name: Install Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.11  # Adjust the Python version as needed
+
+    - name: Install pypandoc
+      run: |
+        python -m pip install --upgrade pip
+        pip install pypandoc
+
+    - name: Run create_files.py
+      run: python create_files.py  # Adjust the path to your script
+
+    - name: Archive Output Directory
+      uses: actions/upload-artifact@v2
+      with:
+        name: output-html
+        path: output  # Adjust the path to your output directory
