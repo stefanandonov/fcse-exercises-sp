@@ -23,7 +23,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  check-changes-for-dockerfile:
+  changes:
     runs-on: ubuntu-latest
     outputs:
       dockerfile: ${{ steps.changes.outputs.dockerfile }}
