@@ -23,7 +23,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build-and-push:
+  create-docker-image:
     runs-on: ubuntu-latest
 
     steps:
@@ -48,7 +48,7 @@ jobs:
 
   build-htmls:
     runs-on: ubuntu-latest
-
+    needs: create-docker-image
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
@@ -85,7 +85,7 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    needs: build
+    needs: build-html
     steps:
       - name: Checkout
         uses: actions/checkout@v3
