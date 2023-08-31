@@ -1,4 +1,5 @@
 import os
+import shutil
 
 import pypandoc
 
@@ -27,14 +28,17 @@ for source_folder in source_folders:
 			extra_args=['-s']
 		)
 
-for source_folder in source_folders:
-	for doc in os.listdir(f"./src/{source_folder}"):
-		doc_path = os.path.join(f"./src/{source_folder}", doc)
-		pdf_path = os.path.join(PDF_OUTPUT_DIR, source_folder, doc.replace("md", "pdf"))
-		create_folder(pdf_path)
-		output = pypandoc.convert_file(
-			source_file=doc_path,
-			to='pdf',
-			outputfile=pdf_path,
-			extra_args=['-s', '--pdf-engine=xelatex']
-		)
+# for source_folder in source_folders:
+# 	for doc in os.listdir(f"./src/{source_folder}"):
+# 		doc_path = os.path.join(f"./src/{source_folder}", doc)
+# 		pdf_path = os.path.join(PDF_OUTPUT_DIR, source_folder, doc.replace("md", "pdf"))
+# 		create_folder(pdf_path)
+# 		output = pypandoc.convert_file(
+# 			source_file=doc_path,
+# 			to='pdf',
+# 			outputfile=pdf_path,
+# 			extra_args=['--listings', '-s', '--pdf-engine=xelatex', '--extract-media=../img']
+# 		)
+
+# shutil.copy2("src/img", "output/img")
+shutil.copytree("src/img", "output/output_html/img")
