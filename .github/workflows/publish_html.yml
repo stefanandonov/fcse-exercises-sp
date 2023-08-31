@@ -54,7 +54,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: output-html
-        path: output  # Adjust the path to your output directory
+        path: output/output_html  # Adjust the path to your output directory
   deploy:
     environment:
       name: github-pages
@@ -64,13 +64,19 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: output-html
+          path: created_htmls
       - name: Setup Pages
         uses: actions/configure-pages@v3
+      - name: Make sure the files from the artifact are present
+        run: ls -l created_htmls
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:
-          # Upload entire repository
-          path: 'output/output_html'
+          path: 'created_htmls'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v2
