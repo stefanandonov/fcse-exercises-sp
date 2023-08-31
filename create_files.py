@@ -36,5 +36,5 @@ for source_folder in source_folders:
 			source_file=doc_path,
 			to='pdf',
 			outputfile=pdf_path,
-			extra_args=['-s', '--pdf-engine=xelatex', '--listings=false']
+			extra_args=['-s', '--pdf-engine=xelatex']
 		)
